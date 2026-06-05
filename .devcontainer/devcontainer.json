@@ -1,0 +1,61 @@
+{
+  "name": "dev-env-template",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "context": ".."
+  },
+  "features": {
+    "ghcr.io/devcontainers/features/git:1": {},
+    "ghcr.io/devcontainers/features/node:2.0.0": {
+      "version": "22"
+    }
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "ms-toolsai.jupyter",
+        "charliermarsh.ruff",
+        "esbenp.prettier-vscode",
+        "yzahng.markdown-all-in-one",
+        "hediet.vscode-drawio",
+        "marp-team.marp-vscode",
+        "bierner.markdown-mermaid",
+        "sqltools-community.sqltools",
+        "dorzey.vscode-sqlfluff"
+      ],
+      "settings": {
+        "python.defaultInterpreterPath": "/workspace/.venv/bin/python",
+        "python.languageServer": "Jedi",
+        "editor.formatOnSave": true,
+        "sqlfluff.dialect": "ansi",
+        "sqlfluff.format.enabled": true,
+        // --- ここからパフォーマンス対策の追記 ---
+        "files.watcherExclude": {
+          "**/.git/objects/**": true,
+          "**/node_modules/**": true,
+          "**/.venv/**": true,
+          "**/__pycache__/**": true
+        },
+        "search.exclude": {
+          "**/node_modules": true,
+          "**/dist": true,
+          "**/.venv": true,
+          "**/__pycache__": true
+        },
+        "python.analysis.indexing": false,
+        "python.analysis.userFileIndexingLimit": 500,
+        "python.analysis.packageIndexLimit": 500
+      }
+    }
+  },
+  "workspaceFolder": "/workspace",
+  "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind,Z",
+  // --- 追記: 名前付きボリュームで I/O 負荷をバイパス ---
+  "mounts": [
+    "source=${localWorkspaceFolderBasename}-node_modules,target=/workspace/node_modules,type=volume",
+    "source=${localWorkspaceFolderBasename}-venv,target=/workspace/.venv,type=volume"
+  ],
+  "postCreateCommand": "bash .devcontainer/post-create.sh",
+  "remoteUser": "vscode"
+}
